@@ -1,0 +1,58 @@
+# CI — runs the repo's gates (`just ci`: lint + typecheck + test).
+#
+# hcc depends on headlesscode via `file:../headlesscode`, so this
+# workflow checks out Capsize-Games/headlesscode as a sibling of the
+# hcc checkout before installing. No API key or network access beyond
+# npm is needed.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint-typecheck-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: hcc
+    steps:
+      - name: Check out hcc
+        uses: actions/checkout@v4
+        with:
+          path: hcc
+          persist-credentials: false
+
+      # Sibling of the hcc checkout, so `file:../headlesscode` in
+      # package.json (and the `../headlesscode/...` tsconfig include)
+      # resolve. Tracks headlesscode's default branch.
+      - name: Check out headlesscode (sibling dependency)
+        uses: actions/checkout@v4
+        with:
+          repository: Capsize-Games/headlesscode
+          path: headlesscode
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: hcc/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
