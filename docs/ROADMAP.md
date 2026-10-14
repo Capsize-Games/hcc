@@ -12,8 +12,8 @@ through; `--help`/`--version` are hcc's own. Gated by `just ci`.
 
 - Pick up headlesscode's force-quit fix (second Ctrl-C exits a hung
   turn) once it merges; the `file:` dependency tracks the checkout.
-- Keyboard audit: every state (prompt, turn, paste, conflict) keeps a
-  documented exit path. No trap states.
+- Keyboard audit: done — see docs/KEYBOARD.md (13 states, 3
+  cross-repo follow-ups H1-H3 filed there for headlesscode).
 - `/help` parity review against headlesscode chat commands.
 
 ## Phase 2 — full TUI
