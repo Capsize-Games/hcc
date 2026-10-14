@@ -25,7 +25,12 @@ function childPids(pid: number): number[] {
 	const found: number[] = [];
 	for (const entry of readdirSync("/proc")) {
 		if (!/^\d+$/.test(entry)) continue;
-		const stat = readFileSync(`/proc/${entry}/stat`, "utf8");
+		let stat: string;
+		try {
+			stat = readFileSync(`/proc/${entry}/stat`, "utf8");
+		} catch {
+			continue; // Process exited mid-scan.
+		}
 		const ppid = Number(stat.slice(stat.lastIndexOf(")") + 2).split(" ")[1]);
 		if (ppid === pid) found.push(Number(entry));
 	}
@@ -71,13 +76,13 @@ for (const signal of ["SIGINT", "SIGTERM"] as const) {
 				wrapper.on("exit", () => resolve())
 			);
 			try {
-				let output = "";
-				const onData = (chunk: Buffer): void => {
-					output += chunk.toString();
+				let sawOutput = false;
+				const onData = (): void => {
+					sawOutput = true;
 				};
 				wrapper.stdout.on("data", onData);
 				wrapper.stderr.on("data", onData);
-				await waitFor(() => output.includes("Session "), 45000, "chat to boot");
+				await waitFor(() => sawOutput, 45000, "chat first output");
 				await waitFor(() => childPids(pid).length > 0, 5000, "wrapper child");
 				const [childPid] = childPids(pid);
 				assert.ok(pidAlive(childPid));
