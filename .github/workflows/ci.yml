@@ -45,14 +45,19 @@ jobs:
           cache: npm
           cache-dependency-path: hcc/package-lock.json
 
+      - name: Install just
+        uses: taiki-e/install-action@v2
+        with:
+          tool: just
+
       - name: Install dependencies
         run: npm ci
 
       - name: Lint
-        run: npm run lint
+        run: just lint
 
       - name: Typecheck
-        run: npm run typecheck
+        run: just typecheck
 
       - name: Test
-        run: npm test
+        run: just test
