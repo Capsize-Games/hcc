@@ -32,4 +32,4 @@ just setup    # install dependencies
 just ci       # lint + typecheck + test
 ```
 
-Proprietary — © 2026 Capsize LLC. See LICENSE.
+MIT — © 2026 Capsize LLC. See LICENSE.

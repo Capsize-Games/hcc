@@ -28,5 +28,5 @@
 		"rules": ["capsize/base", "capsize/tool", "capsize/lang/typescript"]
 	},
 	"owner": "Capsize-Games",
-	"license": "LicenseRef-Capsize-Proprietary"
+	"license": "MIT"
 }

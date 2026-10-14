@@ -10,4 +10,5 @@ agent behavior lives in the `headlesscode` dependency (`file:../headlesscode`).
   presentation, argument handling, and interface configuration.
 - Every user-facing behavior needs a test in `test/` (run: `just test`).
 - `just ci` (lint + typecheck + test) must pass before merge.
-- Proprietary: LicenseRef-Capsize-Proprietary. Never add MIT text.
+- MIT licensed (explicit owner decision 2026-10-14: the interface
+  layer is MIT; the headlesscode harness stays Apache-2.0).
