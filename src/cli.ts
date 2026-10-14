@@ -27,7 +27,8 @@ function usage(): string {
 		"       hcc --help | --version",
 		"",
 		"Opens the terminal chat. Each message starts one turn; /help lists",
-		"chat commands once inside.",
+		"chat commands once inside. Quit with /exit or Ctrl-D; press",
+		"Ctrl-C twice to force quit a stuck turn.",
 	].join("\n");
 }
 
