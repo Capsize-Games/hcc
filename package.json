@@ -1,6 +1,6 @@
 {
 	"name": "hcc",
-	"version": "0.3.0",
+	"version": "0.4.0",
 	"description": "Interactive terminal interface for the headlesscode coding-agent harness.",
 	"license": "MIT",
 	"private": true,
