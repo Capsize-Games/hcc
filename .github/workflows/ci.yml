@@ -43,12 +43,20 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: hcc/package-lock.json
+          cache-dependency-path: |
+            hcc/package-lock.json
+            headlesscode/package-lock.json
 
       - name: Install just
         uses: taiki-e/install-action@v2
         with:
           tool: just
+
+      # The sibling checkout needs its own node_modules: hcc's
+      # typecheck follows the file: symlink into headlesscode src.
+      - name: Install headlesscode dependencies
+        working-directory: headlesscode
+        run: npm ci
 
       - name: Install dependencies
         run: npm ci
