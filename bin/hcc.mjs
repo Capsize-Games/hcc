@@ -7,7 +7,7 @@
  * without tsx on PATH. See headlesscode's bin launcher.
  */
 
-import { spawnSync } from "node:child_process";
+import { spawn } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -31,10 +31,37 @@ if (!tsxCli) {
 	process.exitCode = 2;
 } else {
 	const entry = path.join(PKG_ROOT, "src", "cli.ts");
-	const child = spawnSync(
+	const child = spawn(
 		process.execPath,
 		[tsxCli, entry, ...process.argv.slice(2)],
 		{ stdio: "inherit", env: process.env }
 	);
-	process.exitCode = child.status ?? 1;
+	// Forward termination signals so a real SIGINT/SIGTERM (boot
+	// window before raw mode, kill from another terminal) reaches
+	// the chat child instead of killing only this wrapper and
+	// orphaning the child. Steady-state exits still mirror the
+	// child's code below.
+	const forward = (signal) => {
+		if (child.exitCode === null && child.signalCode === null) {
+			child.kill(signal);
+		}
+	};
+	const onSigint = () => forward("SIGINT");
+	const onSigterm = () => forward("SIGTERM");
+	process.on("SIGINT", onSigint);
+	process.on("SIGTERM", onSigterm);
+	child.on("error", (error) => {
+		console.error(`hcc: failed to start chat: ${error.message}`);
+		process.exitCode = 1;
+	});
+	child.on("exit", (code, signal) => {
+		process.removeListener("SIGINT", onSigint);
+		process.removeListener("SIGTERM", onSigterm);
+		if (signal !== null) {
+			process.kill(process.pid, signal);
+			process.exitCode = 1;
+		} else {
+			process.exitCode = code ?? 1;
+		}
+	});
 }
