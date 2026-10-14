@@ -17,6 +17,7 @@ Requires the headlesscode checkout at `../headlesscode`.
 
 ```sh
 hcc                          # open the terminal chat
+npx @capsizellc/hcc          # try without installing (once published)
 hcc --workspace <path>       # chat scoped to a workspace
 hcc --resume <id>            # resume a session
 hcc --model <model>          # model override

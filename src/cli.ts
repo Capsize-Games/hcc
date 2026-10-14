@@ -13,6 +13,7 @@ import { terminalMain } from "headlesscode/src/terminal/cli.js";
 
 export interface HccIo {
 	stdout: Pick<typeof process.stdout, "write">;
+	errorOutput: Pick<typeof process.stderr, "write">;
 }
 
 interface PackageManifest {
@@ -33,7 +34,10 @@ export function packageRoot(fromUrl: string = import.meta.url): string {
 	let dir = dirname(fileURLToPath(fromUrl));
 	while (true) {
 		const manifest = join(dir, "package.json");
-		if (existsSync(manifest) && readManifest(manifest).name === "hcc") {
+		const name = existsSync(manifest)
+			? readManifest(manifest).name
+			: undefined;
+		if (name === "hcc" || name === "@capsizellc/hcc") {
 			return dir;
 		}
 		const parent = dirname(dir);
@@ -47,6 +51,11 @@ export function packageRoot(fromUrl: string = import.meta.url): string {
 export function packageVersion(fromUrl: string = import.meta.url): string {
 	return readManifest(join(packageRoot(fromUrl), "package.json")).version;
 }
+
+const processIo: HccIo = {
+	stdout: process.stdout,
+	errorOutput: process.stderr,
+};
 
 function usage(): string {
 	return [
@@ -63,7 +72,7 @@ function usage(): string {
 
 export async function hccMain(
 	argv: string[],
-	io: HccIo = { stdout: process.stdout }
+	io: HccIo = processIo
 ): Promise<number> {
 	if (argv.includes("--help") || argv.includes("-h")) {
 		io.stdout.write(`${usage()}\n`);
@@ -75,8 +84,8 @@ export async function hccMain(
 	}
 	const passthrough = argv[0] === "chat" ? argv.slice(1) : argv;
 	return terminalMain(passthrough, {
-		output: process.stdout,
-		errorOutput: process.stderr,
+		output: io.stdout as NodeJS.WriteStream,
+		errorOutput: io.errorOutput as NodeJS.WriteStream,
 	});
 }
 
