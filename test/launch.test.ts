@@ -4,7 +4,7 @@ import { dirname, join } from "node:path";
 import test from "node:test";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { terminalMain } from "headlesscode/src/terminal/cli.js";
-import { hccMain, packageVersion } from "../src/cli.js";
+import { hccMain, isMainModule, packageVersion } from "../src/cli.js";
 
 function capture() {
 	let text = "";
@@ -67,4 +67,24 @@ test("hcc reaches headlesscode chat", async () => {
 	});
 	assert.equal(code, 0);
 	assert.match(io.text(), /terminal chat|Usage/i);
+});
+
+test("isMainModule matches the current module file", () => {
+	const cliPath = join(repoRoot(), "src", "cli.ts");
+	const cliUrl = pathToFileURL(cliPath).href;
+	assert.equal(isMainModule(cliPath, cliUrl), true);
+	assert.equal(isMainModule(cliPath), true);
+});
+
+test("isMainModule rejects other entry points", () => {
+	const cliUrl = pathToFileURL(join(repoRoot(), "src", "cli.ts")).href;
+	const other = fileURLToPath(import.meta.url);
+	assert.equal(isMainModule(other, cliUrl), false);
+	assert.equal(isMainModule(other), false);
+});
+
+test("isMainModule rejects undefined argv1", () => {
+	const cliUrl = pathToFileURL(join(repoRoot(), "src", "cli.ts")).href;
+	assert.equal(isMainModule(undefined, cliUrl), false);
+	assert.equal(isMainModule(undefined), false);
 });

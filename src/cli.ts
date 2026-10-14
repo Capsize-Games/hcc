@@ -6,7 +6,7 @@
  * through to it. Exit codes mirror headlesscode's chat command.
  */
 
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { terminalMain } from "headlesscode/src/terminal/cli.js";
@@ -87,8 +87,28 @@ export async function hccMain(
 	});
 }
 
-const invoked = process.argv[1]?.endsWith("src/cli.ts") ?? false;
-if (invoked) {
+/**
+ * True when `argv1` is the current module file, under any
+ * src/dist layout. Compares canonical paths so symlinked
+ * entry points and relative invocations still match.
+ */
+export function isMainModule(
+	argv1: string | undefined,
+	metaUrl: string = import.meta.url
+): boolean {
+	if (argv1 === undefined) {
+		return false;
+	}
+	try {
+		const entry = realpathSync(argv1);
+		const self = realpathSync(fileURLToPath(metaUrl));
+		return entry === self;
+	} catch {
+		return false;
+	}
+}
+
+if (isMainModule(process.argv[1])) {
 	hccMain(process.argv.slice(2))
 		.then((code) => {
 			process.exitCode = code;
