@@ -1,0 +1,30 @@
+{
+	"name": "hcc",
+	"version": "0.1.0",
+	"description": "Interactive terminal interface for the headlesscode coding-agent harness.",
+	"license": "LicenseRef-Capsize-Proprietary",
+	"private": true,
+	"type": "module",
+	"engines": {
+		"node": ">=22"
+	},
+	"bin": {
+		"hcc": "bin/hcc.mjs"
+	},
+	"scripts": {
+		"start": "tsx src/cli.ts",
+		"test": "tsx --test test/*.test.ts",
+		"typecheck": "tsc --noEmit",
+		"format": "prettier --write .",
+		"lint": "prettier --check ."
+	},
+	"dependencies": {
+		"headlesscode": "file:../headlesscode"
+	},
+	"devDependencies": {
+		"@types/node": "^26.6.5",
+		"prettier": "^3.6.2",
+		"tsx": "^4.20.3",
+		"typescript": "^5.9.2"
+	}
+}

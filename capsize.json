@@ -1,0 +1,32 @@
+{
+	"$schema": "https://capsize.dev/schemas/capsize-1.json",
+	"schema_version": 1,
+	"standards": "1.x",
+	"name": "hcc",
+	"type": "tool",
+	"languages": ["typescript"],
+	"framework": null,
+	"databases": [],
+	"runtimes": { "python": null, "node": "22" },
+	"entrypoints": { "bin": "bin/hcc.mjs" },
+	"task_runner": "just",
+	"commands": {
+		"setup": "setup",
+		"build": "build",
+		"test": "test",
+		"lint": "lint",
+		"format": "format",
+		"typecheck": "typecheck",
+		"run": "run",
+		"clean": "clean",
+		"docs": null,
+		"ci": "ci"
+	},
+	"dependencies": { "python": null, "node": "package.json" },
+	"instructions": {
+		"canonical": "AGENTS.md",
+		"rules": ["capsize/base", "capsize/tool", "capsize/lang/typescript"]
+	},
+	"owner": "Capsize-Games",
+	"license": "LicenseRef-Capsize-Proprietary"
+}
