@@ -19,12 +19,12 @@
 		"lint": "prettier --check ."
 	},
 	"dependencies": {
-		"headlesscode": "file:../headlesscode"
+		"headlesscode": "file:../headlesscode",
+		"tsx": "^4.20.3"
 	},
 	"devDependencies": {
 		"@types/node": "^26.6.5",
 		"prettier": "^3.6.2",
-		"tsx": "^4.20.3",
 		"typescript": "^5.9.2"
 	}
 }
