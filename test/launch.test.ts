@@ -5,13 +5,13 @@ import { hccMain } from "../src/cli.js";
 
 function capture() {
 	let text = "";
-	const stdout = {
+	const sink = {
 		write: (chunk: string): boolean => {
 			text += chunk;
 			return true;
 		},
 	};
-	return { stdout, text: () => text };
+	return { stdout: sink, errorOutput: sink, text: () => text };
 }
 
 test("hcc --help describes the command", async () => {
