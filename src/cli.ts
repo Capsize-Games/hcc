@@ -6,7 +6,9 @@
  * through to it. Exit codes mirror headlesscode's chat command.
  */
 
-import { createRequire } from "node:module";
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { terminalMain } from "headlesscode/src/terminal/cli.js";
 
 export interface HccIo {
@@ -14,16 +16,44 @@ export interface HccIo {
 	errorOutput: Pick<typeof process.stderr, "write">;
 }
 
+interface PackageManifest {
+	name?: string;
+	version: string;
+}
+
+function readManifest(path: string): PackageManifest {
+	return JSON.parse(readFileSync(path, "utf8")) as PackageManifest;
+}
+
+/**
+ * Walk up from `fromUrl` to the hcc package root, so version
+ * resolution keeps working under any src/dist layout or bundling
+ * that leaves the entry point inside the package.
+ */
+export function packageRoot(fromUrl: string = import.meta.url): string {
+	let dir = dirname(fileURLToPath(fromUrl));
+	while (true) {
+		const manifest = join(dir, "package.json");
+		const name = existsSync(manifest) ? readManifest(manifest).name : undefined;
+		if (name === "hcc" || name === "@capsizellc/hcc") {
+			return dir;
+		}
+		const parent = dirname(dir);
+		if (parent === dir) {
+			throw new Error("hcc: package root not found");
+		}
+		dir = parent;
+	}
+}
+
+export function packageVersion(fromUrl: string = import.meta.url): string {
+	return readManifest(join(packageRoot(fromUrl), "package.json")).version;
+}
+
 const processIo: HccIo = {
 	stdout: process.stdout,
 	errorOutput: process.stderr,
 };
-
-function version(): string {
-	const require = createRequire(import.meta.url);
-	const manifest = require("../package.json") as { version: string };
-	return manifest.version;
-}
 
 function usage(): string {
 	return [
@@ -47,7 +77,7 @@ export async function hccMain(
 		return 0;
 	}
 	if (argv.includes("--version") || argv.includes("-v")) {
-		io.stdout.write(`hcc ${version()}\n`);
+		io.stdout.write(`hcc ${packageVersion()}\n`);
 		return 0;
 	}
 	const passthrough = argv[0] === "chat" ? argv.slice(1) : argv;
