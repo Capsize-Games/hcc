@@ -34,9 +34,7 @@ export function packageRoot(fromUrl: string = import.meta.url): string {
 	let dir = dirname(fileURLToPath(fromUrl));
 	while (true) {
 		const manifest = join(dir, "package.json");
-		const name = existsSync(manifest)
-			? readManifest(manifest).name
-			: undefined;
+		const name = existsSync(manifest) ? readManifest(manifest).name : undefined;
 		if (name === "hcc" || name === "@capsizellc/hcc") {
 			return dir;
 		}
